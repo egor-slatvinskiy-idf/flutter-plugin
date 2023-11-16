@@ -76,10 +76,11 @@ class PayMethodCallHandler private constructor(
 
     @Suppress("UNCHECKED_CAST")
     override fun onMethodCall(call: MethodCall, result: Result) {
-        resultStore = result
         when (call.method) {
             METHOD_USER_CAN_PAY -> googlePayHandler.isReadyToPay(result, call.arguments()!!)
             METHOD_SHOW_PAYMENT_SELECTOR -> {
+                resultStore = result
+
                 val arguments = call.arguments<Map<String, Any>>()!!
                 googlePayHandler.loadPaymentData(
                     result,
