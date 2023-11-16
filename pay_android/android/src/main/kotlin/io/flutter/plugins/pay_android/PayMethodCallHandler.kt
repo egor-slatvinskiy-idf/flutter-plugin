@@ -42,21 +42,29 @@ class PayMethodCallHandler private constructor(
 
     private val channel: MethodChannel = MethodChannel(messenger, METHOD_CHANNEL_NAME)
     private val googlePayHandler: GooglePayHandler = GooglePayHandler(activity)
+    private var resultStore: Result? = null
 
     init {
         channel.setMethodCallHandler(this)
     }
 
-    constructor(registrar: Registrar) : this(registrar.messenger(), registrar.activity()!!, null) {
+    constructor(registrar: Registrar) : this(registrar.messenger(), registrar.activity()!!, activityBinding = null) {
         registrar.addActivityResultListener(googlePayHandler)
     }
 
     constructor(
         flutterBinding: FlutterPlugin.FlutterPluginBinding,
         activityBinding: ActivityPluginBinding,
+        resultStore: Result?,
     ) : this(flutterBinding.binaryMessenger, activityBinding.activity, activityBinding) {
+        if (resultStore != null) {
+            this.resultStore = resultStore
+            googlePayHandler.setStoreResult(resultStore)
+        }
         activityBinding.addActivityResultListener(googlePayHandler)
     }
+
+    fun getStoreResult() = resultStore
 
     /**
      * Clears the handler in the method channel when not needed anymore.
@@ -68,6 +76,7 @@ class PayMethodCallHandler private constructor(
 
     @Suppress("UNCHECKED_CAST")
     override fun onMethodCall(call: MethodCall, result: Result) {
+        resultStore = result
         when (call.method) {
             METHOD_USER_CAN_PAY -> googlePayHandler.isReadyToPay(result, call.arguments()!!)
             METHOD_SHOW_PAYMENT_SELECTOR -> {

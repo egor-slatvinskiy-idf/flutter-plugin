@@ -21,6 +21,7 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import io.flutter.plugin.common.MethodChannel.Result
 
 /**
  * Entry point handler for the plugin.
@@ -29,6 +30,7 @@ class PayPlugin : FlutterPlugin, ActivityAware {
 
     private lateinit var flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
     private lateinit var methodCallHandler: PayMethodCallHandler
+    private var storeResult: Result? = null
 
     companion object {
         @JvmStatic
@@ -46,10 +48,13 @@ class PayPlugin : FlutterPlugin, ActivityAware {
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) = Unit
 
     override fun onAttachedToActivity(@NonNull activityPluginBinding: ActivityPluginBinding) {
-        methodCallHandler = PayMethodCallHandler(flutterPluginBinding, activityPluginBinding)
+        methodCallHandler = PayMethodCallHandler(flutterPluginBinding, activityPluginBinding, storeResult)
     }
 
-    override fun onDetachedFromActivity() = methodCallHandler.stopListening()
+    override fun onDetachedFromActivity() {
+        storeResult = methodCallHandler.getStoreResult()
+        methodCallHandler.stopListening()
+    }
 
     override fun onReattachedToActivityForConfigChanges(
             @NonNull activityPluginBinding: ActivityPluginBinding,

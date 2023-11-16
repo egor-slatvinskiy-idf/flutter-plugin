@@ -149,6 +149,12 @@ class GooglePayHandler(private val activity: Activity) :
      * @param paymentProfileString a JSON string with the configuration to execute this payment.
      * @param paymentItems a list of payment elements that determine the total amount purchased.
      */
+
+    fun setStoreResult(result: Result) {
+        if (loadPaymentDataResult == null) loadPaymentDataResult = result
+    }
+
+
     fun loadPaymentData(
             result: Result,
             paymentProfileString: String,
@@ -165,19 +171,6 @@ class GooglePayHandler(private val activity: Activity) :
                 client.loadPaymentData(ldpRequest),
                 activity,
                 LOAD_PAYMENT_DATA_REQUEST_CODE)
-    }
-
-    override fun onSaveInstanceState(savedInstanceState: Bundle) {
-        super.onSaveInstanceState(savedInstanceState);
-        if (loadPaymentDataResult != null) {
-            savedInstanceState.putSerializable("result", loadPaymentDataResult)
-        }
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        val result = savedInstanceState.getSerializable("result") as Result?
-        if (result != null) loadPaymentDataResult = result
     }
 
     override fun onActivityResult(
