@@ -18,7 +18,6 @@ package io.flutter.plugins.pay_android
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Bundle
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.wallet.*
@@ -45,6 +44,10 @@ class GooglePayHandler(private val activity: Activity) :
         PluginRegistry.ActivityResultListener {
 
     private var loadPaymentDataResult: Result? = null
+
+    fun setStoreResult(result: Result) {
+        if (loadPaymentDataResult == null) loadPaymentDataResult = result
+    }
 
     companion object {
 
@@ -149,12 +152,6 @@ class GooglePayHandler(private val activity: Activity) :
      * @param paymentProfileString a JSON string with the configuration to execute this payment.
      * @param paymentItems a list of payment elements that determine the total amount purchased.
      */
-
-    fun setStoreResult(result: Result) {
-        if (loadPaymentDataResult == null) loadPaymentDataResult = result
-    }
-
-
     fun loadPaymentData(
             result: Result,
             paymentProfileString: String,
