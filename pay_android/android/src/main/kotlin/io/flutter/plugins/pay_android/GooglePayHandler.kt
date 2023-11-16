@@ -45,6 +45,10 @@ class GooglePayHandler(private val activity: Activity) :
 
     private var loadPaymentDataResult: Result? = null
 
+    fun setStoreResult(result: Result) {
+        if (loadPaymentDataResult == null) loadPaymentDataResult = result
+    }
+
     companion object {
 
         /**
@@ -212,10 +216,14 @@ class GooglePayHandler(private val activity: Activity) :
      * Data](https://developers.google.com/pay/api/android/reference/object.PaymentData)
      */
     private fun handlePaymentSuccess(paymentData: PaymentData?) {
+        requireNotNull(loadPaymentDataResult) {
+            "GooglePayHandler.handlePaymentSuccess loadPaymentDataResult is null"
+        }
+
         if (paymentData != null) {
-            loadPaymentDataResult!!.success(paymentData.toJson())
+            loadPaymentDataResult?.success(paymentData.toJson())
         } else {
-            loadPaymentDataResult!!.error(
+            loadPaymentDataResult?.error(
                     CommonStatusCodes.INTERNAL_ERROR.toString(),
                     "Unexpected empty result data.",
                     null)
